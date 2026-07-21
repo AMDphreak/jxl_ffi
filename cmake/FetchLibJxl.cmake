@@ -5,7 +5,9 @@ include_guard(GLOBAL)
 # Provides LIBJXL_ROOT in the parent scope.
 #
 # - Windows: downloads `jxl-x64-windows-static.7z` and extracts it.
-# - Linux x86_64: downloads `jxl-linux-x86_64-static.tar.lz` and extracts it.
+# - Linux x86_64: expects `native/prebuilt/linux-x86_64-static` (see
+#   scripts/build_libjxl_prebuilt.sh). The official libjxl .tar.lz release only
+#   ships CLI tools, not static libraries.
 #
 # It also supports an optional manual cache under:
 #   native/prebuilt/<platform>/...
@@ -123,10 +125,6 @@ function(fetch_libjxl)
     endif()
 
     # Official libjxl static prebuilt for x86_64 Linux desktop.
-    set(_archive_name "jxl-linux-x86_64-static.tar.lz")
-    set(_archive_url "${LIBJXL_BASE_URL}/${_archive_name}")
-    set(_extract_subdir "linux-x86_64-static")
-
     set(_prebuilt_lib "${_prebuilt_root}/linux-x86_64-static/lib/libjxl.a")
     if (EXISTS "${_prebuilt_lib}")
       set(LIBJXL_ROOT "${_prebuilt_root}/linux-x86_64-static")
@@ -134,50 +132,12 @@ function(fetch_libjxl)
       return()
     endif()
 
-    set(_download_dir "${_bin_root}/download")
-    file(MAKE_DIRECTORY "${_download_dir}")
-    set(_archive_path "${_download_dir}/${_archive_name}")
-
-    if (NOT EXISTS "${_archive_path}")
-      message(STATUS "Downloading ${_archive_name}...")
-      _libjxl_download_archive("${_archive_url}" "${_archive_path}" 3500000)
-    else()
-      file(SIZE "${_archive_path}" _archive_size)
-      if (_archive_size LESS 3500000)
-        _libjxl_download_archive("${_archive_url}" "${_archive_path}" 3500000)
-      endif()
-    endif()
-
-    set(_extract_dir "${_bin_root}/${_extract_subdir}")
-    file(MAKE_DIRECTORY "${_extract_dir}")
-
-    find_program(_XZ_EXE NAMES xz)
-    if (NOT _XZ_EXE)
-      message(FATAL_ERROR "xz not found. Install xz-utils (apt install xz-utils).")
-    endif()
-
-    message(STATUS "Extracting ${_archive_name}...")
-    execute_process(
-      COMMAND "${_XZ_EXE}" -dc "${_archive_path}"
-      COMMAND tar -xf - -C "${_extract_dir}"
-      RESULT_VARIABLE _extract_rv
-      OUTPUT_VARIABLE _extract_out
-      ERROR_VARIABLE _extract_err
-    )
-    if (NOT _extract_rv EQUAL 0)
-      message(FATAL_ERROR "Failed to extract libjxl prebuilts. ${_extract_err}")
-    endif()
-
-    set(_cand1 "${_extract_dir}")
-    set(_cand2 "${_extract_dir}/${_extract_subdir}")
-
-    if (EXISTS "${_cand1}/include" AND EXISTS "${_cand1}/lib/libjxl.a")
-      set(LIBJXL_ROOT "${_cand1}")
-    elseif (EXISTS "${_cand2}/include" AND EXISTS "${_cand2}/lib/libjxl.a")
-      set(LIBJXL_ROOT "${_cand2}")
-    else()
-      message(FATAL_ERROR "Could not locate extracted libjxl root under ${_extract_dir}")
-    endif()
+    message(FATAL_ERROR
+      "libjxl static prebuilt not found.\n"
+      "  Expected: ${_prebuilt_lib}\n"
+      "  On Linux x86_64 run: scripts/build_libjxl_prebuilt.sh\n"
+      "  Note: the official jxl-linux-x86_64-static.tar.lz release asset only "
+      "contains CLI tools (lzip), not linkable static libraries.")
   endif()
 
   set(LIBJXL_ROOT "${LIBJXL_ROOT}" PARENT_SCOPE)
