@@ -6,6 +6,7 @@
 #include <jxl/types.h>
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 static void* jxl_create_parallel_runner(void) {
   return JxlThreadParallelRunnerCreate(NULL,
