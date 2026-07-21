@@ -4,8 +4,6 @@ import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 
-typedef _JxlBridgeVersionNative = ffi.Uint32 Function();
-typedef _JxlBridgeVersionDart = int Function();
 
 typedef _JxlBridgeDecodeNative = ffi.Int32 Function(
   ffi.Pointer<ffi.Uint8> inPtr,
@@ -114,10 +112,10 @@ abstract final class JxlFfi {
     if (native == null) return null;
 
     final int inLen = jxl.lengthInBytes;
-    final Pointer<Uint8> inPtr = malloc<Uint8>(inLen);
+    final ffi.Pointer<ffi.Uint8> inPtr = malloc<ffi.Uint8>(inLen);
     inPtr.asTypedList(inLen).setAll(0, jxl);
 
-    final outRgbaPtr = calloc<Pointer<Uint8>>();
+    final outRgbaPtr = calloc<ffi.Pointer<ffi.Uint8>>();
     final wPtr = calloc<ffi.Uint32>();
     final hPtr = calloc<ffi.Uint32>();
 
@@ -130,11 +128,11 @@ abstract final class JxlFfi {
     );
 
     // Native returns 0 on success; negative on failure.
-    if (status != 0 || outRgbaPtr.value == ffi.Pointer<Uint8>.fromAddress(0)) {
-      free(inPtr);
-      free(outRgbaPtr);
-      free(wPtr);
-      free(hPtr);
+    if (status != 0 || outRgbaPtr.value == ffi.Pointer<ffi.Uint8>.fromAddress(0)) {
+      malloc.free(inPtr);
+      malloc.free(outRgbaPtr);
+      malloc.free(wPtr);
+      malloc.free(hPtr);
       return null;
     }
 
@@ -151,10 +149,10 @@ abstract final class JxlFfi {
 
     native._free(outRgbaPtr.value.cast<ffi.Void>());
 
-    free(inPtr);
-    free(outRgbaPtr);
-    free(wPtr);
-    free(hPtr);
+    malloc.free(inPtr);
+    malloc.free(outRgbaPtr);
+    malloc.free(wPtr);
+    malloc.free(hPtr);
 
     return result;
   }
@@ -169,10 +167,10 @@ abstract final class JxlFfi {
     if (native == null) return null;
 
     final int rgbaLen = rgba.lengthInBytes;
-    final Pointer<Uint8> rgbaPtr = malloc<Uint8>(rgbaLen);
+    final ffi.Pointer<ffi.Uint8> rgbaPtr = malloc<ffi.Uint8>(rgbaLen);
     rgbaPtr.asTypedList(rgbaLen).setAll(0, rgba);
 
-    final outPtr = calloc<Pointer<Uint8>>();
+    final outPtr = calloc<ffi.Pointer<ffi.Uint8>>();
     final outLenPtr = calloc<ffi.Size>();
 
     final int status = native._encodeLossless(
@@ -184,10 +182,10 @@ abstract final class JxlFfi {
       outLenPtr,
     );
 
-    if (status != 0 || outPtr.value == ffi.Pointer<Uint8>.fromAddress(0)) {
-      free(rgbaPtr);
-      free(outPtr);
-      free(outLenPtr);
+    if (status != 0 || outPtr.value == ffi.Pointer<ffi.Uint8>.fromAddress(0)) {
+      malloc.free(rgbaPtr);
+      malloc.free(outPtr);
+      malloc.free(outLenPtr);
       return null;
     }
 
@@ -197,9 +195,9 @@ abstract final class JxlFfi {
 
     native._free(outPtr.value.cast<ffi.Void>());
 
-    free(rgbaPtr);
-    free(outPtr);
-    free(outLenPtr);
+    malloc.free(rgbaPtr);
+    malloc.free(outPtr);
+    malloc.free(outLenPtr);
     return result;
   }
 
@@ -213,10 +211,10 @@ abstract final class JxlFfi {
     if (native == null) return null;
 
     final int rgbLen = rgb.lengthInBytes;
-    final Pointer<Uint8> rgbPtr = malloc<Uint8>(rgbLen);
+    final ffi.Pointer<ffi.Uint8> rgbPtr = malloc<ffi.Uint8>(rgbLen);
     rgbPtr.asTypedList(rgbLen).setAll(0, rgb);
 
-    final outPtr = calloc<Pointer<Uint8>>();
+    final outPtr = calloc<ffi.Pointer<ffi.Uint8>>();
     final outLenPtr = calloc<ffi.Size>();
 
     final int status = native._encodeLossy(
@@ -228,10 +226,10 @@ abstract final class JxlFfi {
       outLenPtr,
     );
 
-    if (status != 0 || outPtr.value == ffi.Pointer<Uint8>.fromAddress(0)) {
-      free(rgbPtr);
-      free(outPtr);
-      free(outLenPtr);
+    if (status != 0 || outPtr.value == ffi.Pointer<ffi.Uint8>.fromAddress(0)) {
+      malloc.free(rgbPtr);
+      malloc.free(outPtr);
+      malloc.free(outLenPtr);
       return null;
     }
 
@@ -241,9 +239,9 @@ abstract final class JxlFfi {
 
     native._free(outPtr.value.cast<ffi.Void>());
 
-    free(rgbPtr);
-    free(outPtr);
-    free(outLenPtr);
+    malloc.free(rgbPtr);
+    malloc.free(outPtr);
+    malloc.free(outLenPtr);
     return result;
   }
 }

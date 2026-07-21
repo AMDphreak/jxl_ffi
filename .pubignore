@@ -1,0 +1,18 @@
+# Published package contents (deny-list). Overrides .gitignore for dart pub publish.
+
+.dart_tool/
+.build/
+.buildlog/
+.idea/
+.vscode/
+*.iml
+**/doc/api/
+**/coverage/
+**/native/prebuilt/
+**/build/
+**/.flutter-plugins-dependencies
+pubspec.lock
+example/pubspec.lock
+
+# Example app is for local demo; keep out of the published tarball size
+example/

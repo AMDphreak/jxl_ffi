@@ -1,4 +1,4 @@
-# Allow-list .gitignore — everything ignored unless explicitly un-ignored.
+# Allow-list .gitignore â€” everything ignored unless explicitly un-ignored.
 
 *
 !.gitignore
@@ -7,6 +7,9 @@
 !analysis_options.yaml
 !pubspec.yaml
 !README.adoc
+!README.md
+!CHANGELOG.md
+!.pubignore
 !CHANGELOG.adoc
 !LICENSE
 !LICENSE.*
