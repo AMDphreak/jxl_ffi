@@ -5,9 +5,15 @@ cmake_minimum_required(VERSION 3.10)
 
 project(jxl_ffi_library VERSION 0.0.1 LANGUAGES C)
 
-add_library(jxl_ffi SHARED
-  "jxl_bridge.c"
-)
+if (JXL_FFI_BUILD_STUB)
+  add_library(jxl_ffi SHARED
+    "jxl_bridge_stub.c"
+  )
+else()
+  add_library(jxl_ffi SHARED
+    "jxl_bridge.c"
+  )
+endif()
 
 set_target_properties(jxl_ffi PROPERTIES
   PUBLIC_HEADER jxl_bridge.h

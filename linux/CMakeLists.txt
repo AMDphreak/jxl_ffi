@@ -7,41 +7,50 @@ cmake_minimum_required(VERSION 3.10)
 set(PROJECT_NAME "jxl_ffi")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
+# libjxl only publishes linux-x86_64 static prebuilts; aarch64 uses a stub .so.
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+  set(JXL_FFI_BUILD_STUB TRUE)
+endif()
+
 # Invoke the build for native code shared with the other target platforms.
 # This can be changed to accommodate different builds.
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../src" "${CMAKE_CURRENT_BINARY_DIR}/shared")
 
-# Pull in the official libjxl prebuilt static archives.
-include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/FetchLibJxl.cmake")
-fetch_libjxl()
+if (NOT JXL_FFI_BUILD_STUB)
+  # Pull in the official libjxl prebuilt static archives.
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/FetchLibJxl.cmake")
+  fetch_libjxl()
 
-# Header path.
-target_include_directories(jxl_ffi PRIVATE "${LIBJXL_ROOT}/include")
+  # Header path.
+  target_include_directories(jxl_ffi PRIVATE "${LIBJXL_ROOT}/include")
 
-# Link static archives (libjxl + dependencies).
-set(_LIBJXL_LIB_DIR "${LIBJXL_ROOT}/lib")
-set(_lib_candidates
-  "${_LIBJXL_LIB_DIR}/libjxl.a"
-  "${_LIBJXL_LIB_DIR}/libjxl_cms.a"
-  "${_LIBJXL_LIB_DIR}/libjxl_threads.a"
-  "${_LIBJXL_LIB_DIR}/hwy.a"
-  "${_LIBJXL_LIB_DIR}/libhwy.a"
-  "${_LIBJXL_LIB_DIR}/libbrotlicommon.a"
-  "${_LIBJXL_LIB_DIR}/libbrotlidec.a"
-  "${_LIBJXL_LIB_DIR}/libbrotlienc.a"
-)
-set(_libs_to_link "")
-foreach(_c IN LISTS _lib_candidates)
-  if (EXISTS "${_c}")
-    list(APPEND _libs_to_link "${_c}")
+  # Link static archives (libjxl + dependencies).
+  set(_LIBJXL_LIB_DIR "${LIBJXL_ROOT}/lib")
+  set(_lib_candidates
+    "${_LIBJXL_LIB_DIR}/libjxl.a"
+    "${_LIBJXL_LIB_DIR}/libjxl_cms.a"
+    "${_LIBJXL_LIB_DIR}/libjxl_threads.a"
+    "${_LIBJXL_LIB_DIR}/hwy.a"
+    "${_LIBJXL_LIB_DIR}/libhwy.a"
+    "${_LIBJXL_LIB_DIR}/libbrotlicommon.a"
+    "${_LIBJXL_LIB_DIR}/libbrotlidec.a"
+    "${_LIBJXL_LIB_DIR}/libbrotlienc.a"
+  )
+  set(_libs_to_link "")
+  foreach(_c IN LISTS _lib_candidates)
+    if (EXISTS "${_c}")
+      list(APPEND _libs_to_link "${_c}")
+    endif()
+  endforeach()
+
+  if (_libs_to_link STREQUAL "")
+    message(FATAL_ERROR "No libjxl static archives found under ${_LIBJXL_LIB_DIR}")
   endif()
-endforeach()
 
-if (_libs_to_link STREQUAL "")
-  message(FATAL_ERROR "No libjxl static archives found under ${_LIBJXL_LIB_DIR}")
+  target_link_libraries(jxl_ffi PRIVATE ${_libs_to_link})
+else()
+  message(STATUS "jxl_ffi: building stub (no libjxl prebuilt for ${CMAKE_SYSTEM_PROCESSOR})")
 endif()
-
-target_link_libraries(jxl_ffi PRIVATE ${_libs_to_link})
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an

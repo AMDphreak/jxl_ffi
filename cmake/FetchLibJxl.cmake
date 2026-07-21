@@ -5,10 +5,48 @@ include_guard(GLOBAL)
 # Provides LIBJXL_ROOT in the parent scope.
 #
 # - Windows: downloads `jxl-x64-windows-static.7z` and extracts it.
-# - Linux: downloads `jxl-linux-x86_64-static.tar.lz` and extracts it.
+# - Linux x86_64: downloads `jxl-linux-x86_64-static.tar.lz` and extracts it.
 #
 # It also supports an optional manual cache under:
 #   native/prebuilt/<platform>/...
+function(_libjxl_download_archive archive_url archive_path min_bytes)
+  set(_attempts 0)
+  while(_attempts LESS 2)
+    math(EXPR _attempts "${_attempts} + 1")
+    if (EXISTS "${archive_path}")
+      file(SIZE "${archive_path}" _existing_size)
+      if (_existing_size LESS ${min_bytes})
+        message(WARNING "Removing corrupt libjxl archive (${_existing_size} bytes): ${archive_path}")
+        file(REMOVE "${archive_path}")
+      endif()
+    endif()
+
+    if (NOT EXISTS "${archive_path}")
+      message(STATUS "Downloading ${archive_path}...")
+      file(
+        DOWNLOAD "${archive_url}" "${archive_path}"
+        SHOW_PROGRESS
+        STATUS _dl_status
+        TLS_VERIFY ON
+      )
+      list(GET _dl_status 0 _dl_code)
+      if (NOT _dl_code EQUAL 0)
+        message(FATAL_ERROR "Failed to download libjxl prebuilts: ${_dl_status}")
+      endif()
+    endif()
+
+    file(SIZE "${archive_path}" _archive_size)
+    if (_archive_size GREATER_EQUAL ${min_bytes})
+      return()
+    endif()
+
+    message(WARNING "Downloaded libjxl archive too small (${_archive_size} bytes); retrying...")
+    file(REMOVE "${archive_path}")
+  endwhile()
+
+  message(FATAL_ERROR "libjxl archive at ${archive_path} is invalid (${_archive_size} bytes; expected >= ${min_bytes})")
+endfunction()
+
 function(fetch_libjxl)
   set(JXL_VERSION "0.12.0")
   set(LIBJXL_BASE_URL
@@ -35,14 +73,11 @@ function(fetch_libjxl)
 
     if (NOT EXISTS "${_archive_path}")
       message(STATUS "Downloading ${_archive_name}...")
-      file(
-        DOWNLOAD "${_archive_url}" "${_archive_path}"
-        SHOW_PROGRESS
-        STATUS _dl_status
-      )
-      list(GET _dl_status 0 _dl_code)
-      if (NOT _dl_code EQUAL 0)
-        message(FATAL_ERROR "Failed to download libjxl prebuilts: ${_dl_status}")
+      _libjxl_download_archive("${_archive_url}" "${_archive_path}" 7000000)
+    else()
+      file(SIZE "${_archive_path}" _archive_size)
+      if (_archive_size LESS 7000000)
+        _libjxl_download_archive("${_archive_url}" "${_archive_path}" 7000000)
       endif()
     endif()
 
@@ -81,7 +116,13 @@ function(fetch_libjxl)
     endif()
 
   else()
-    # Assume x86_64 Linux desktop.
+    if (NOT CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
+      message(FATAL_ERROR
+        "fetch_libjxl: unsupported Linux CPU '${CMAKE_SYSTEM_PROCESSOR}' "
+        "(only x86_64 is supported; aarch64 should use JXL_FFI_BUILD_STUB)")
+    endif()
+
+    # Official libjxl static prebuilt for x86_64 Linux desktop.
     set(_archive_name "jxl-linux-x86_64-static.tar.lz")
     set(_archive_url "${LIBJXL_BASE_URL}/${_archive_name}")
     set(_extract_subdir "linux-x86_64-static")
@@ -99,23 +140,26 @@ function(fetch_libjxl)
 
     if (NOT EXISTS "${_archive_path}")
       message(STATUS "Downloading ${_archive_name}...")
-      file(
-        DOWNLOAD "${_archive_url}" "${_archive_path}"
-        SHOW_PROGRESS
-        STATUS _dl_status
-      )
-      list(GET _dl_status 0 _dl_code)
-      if (NOT _dl_code EQUAL 0)
-        message(FATAL_ERROR "Failed to download libjxl prebuilts: ${_dl_status}")
+      _libjxl_download_archive("${_archive_url}" "${_archive_path}" 3500000)
+    else()
+      file(SIZE "${_archive_path}" _archive_size)
+      if (_archive_size LESS 3500000)
+        _libjxl_download_archive("${_archive_url}" "${_archive_path}" 3500000)
       endif()
     endif()
 
     set(_extract_dir "${_bin_root}/${_extract_subdir}")
     file(MAKE_DIRECTORY "${_extract_dir}")
 
+    find_program(_XZ_EXE NAMES xz)
+    if (NOT _XZ_EXE)
+      message(FATAL_ERROR "xz not found. Install xz-utils (apt install xz-utils).")
+    endif()
+
     message(STATUS "Extracting ${_archive_name}...")
     execute_process(
-      COMMAND tar --lzma -xf "${_archive_path}" -C "${_extract_dir}"
+      COMMAND "${_XZ_EXE}" -dc "${_archive_path}"
+      COMMAND tar -xf - -C "${_extract_dir}"
       RESULT_VARIABLE _extract_rv
       OUTPUT_VARIABLE _extract_out
       ERROR_VARIABLE _extract_err
