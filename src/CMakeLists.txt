@@ -22,6 +22,13 @@ set_target_properties(jxl_ffi PROPERTIES
 
 target_compile_definitions(jxl_ffi PUBLIC DART_SHARED_LIB)
 
+if (JXL_FFI_INCLUDE)
+  target_include_directories(jxl_ffi PRIVATE "${JXL_FFI_INCLUDE}")
+endif()
+if (JXL_FFI_LIBS)
+  target_link_libraries(jxl_ffi PRIVATE ${JXL_FFI_LIBS})
+endif()
+
 if (ANDROID)
   # Support Android 15 16k page size
   target_link_options(jxl_ffi PRIVATE "-Wl,-z,max-page-size=16384")

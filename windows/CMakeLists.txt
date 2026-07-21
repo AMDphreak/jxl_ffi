@@ -8,20 +8,13 @@ cmake_minimum_required(VERSION 3.14)
 set(PROJECT_NAME "jxl_ffi")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
-# Invoke the build for native code shared with the other target platforms.
-# This can be changed to accommodate different builds.
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../src" "${CMAKE_CURRENT_BINARY_DIR}/shared")
-
 # Pull in the official libjxl prebuilt static archives.
 include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/FetchLibJxl.cmake")
 fetch_libjxl()
 
-# Header path.
-target_include_directories(jxl_ffi PRIVATE "${LIBJXL_ROOT}/include")
-
-# Link static archives.
+set(JXL_FFI_INCLUDE "${LIBJXL_ROOT}/include")
 set(_LIBJXL_LIB_DIR "${LIBJXL_ROOT}/lib")
-target_link_libraries(jxl_ffi PRIVATE
+set(JXL_FFI_LIBS
   "${_LIBJXL_LIB_DIR}/jxl.lib"
   "${_LIBJXL_LIB_DIR}/jxl_cms.lib"
   "${_LIBJXL_LIB_DIR}/jxl_threads.lib"
@@ -30,6 +23,10 @@ target_link_libraries(jxl_ffi PRIVATE
   "${_LIBJXL_LIB_DIR}/brotlidec.lib"
   "${_LIBJXL_LIB_DIR}/brotlienc.lib"
 )
+
+# Invoke the build for native code shared with the other target platforms.
+# This can be changed to accommodate different builds.
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../src" "${CMAKE_CURRENT_BINARY_DIR}/shared")
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
