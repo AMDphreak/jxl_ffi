@@ -1,0 +1,74 @@
+= jxl_ffi
+
+Flutter FFI plugin that wraps **libjxl 0.12.0** static prebuilts for JPEG XL encode and decode on **Windows** and **Linux**.
+
+== Requirements
+
+=== Windows
+
+CMake downloads `jxl-x64-windows-static.7z` from the https://github.com/libjxl/libjxl/releases[libjxl releases] and extracts it with **7-Zip**.
+
+* Install https://www.7-zip.org/[7-Zip], or ensure `7z.exe` is on `PATH`.
+* Default lookup: `C:\Program Files\7-Zip\7z.exe`.
+
+=== Linux
+
+CMake downloads `jxl-linux-x86_64-static.tar.lz` and extracts with:
+
+[source,bash]
+----
+tar --lzma -xf jxl-linux-x86_64-static.tar.lz
+----
+
+Your `tar` must support `--lzma` (GNU tar with lzma, or equivalent).
+
+=== Optional manual prebuilts
+
+You can place extracted archives under `native/prebuilt/` (see `cmake/FetchLibJxl.cmake`) to skip download/extract. That directory is gitignored.
+
+== Usage
+
+[source,dart]
+----
+import 'package:jxl_ffi/jxl_ffi.dart';
+
+if (JxlFfi.isAvailable) {
+  final decoded = JxlFfi.decodeRgba(jxlBytes);
+  // decoded?.rgba, decoded?.width, decoded?.height
+
+  final lossless = JxlFfi.encodeLossless(rgbaBytes, width, height, hasAlpha: true);
+  final lossy = JxlFfi.encodeLossy(rgbBytes, width, height, 1.0);
+}
+----
+
+On platforms without `dart:ffi` (for example web), `JxlFfi.isAvailable` is `false` and methods return `null`.
+
+== API
+
+`JxlFfi` (abstract final class):
+
+* `static bool isAvailable` — native library loaded
+* `static ({Uint8List rgba, int width, int height})? decodeRgba(Uint8List jxl)` — decode to RGBA8
+* `static Uint8List? encodeLossless(Uint8List rgba, int width, int height, {bool hasAlpha})`
+* `static Uint8List? encodeLossy(Uint8List rgb, int width, int height, double distance)` — RGB, no alpha; `distance` is libjxl Butteraugli distance
+
+Native symbols live in the plugin shared library (`jxl_ffi.dll` / `libjxl_ffi.so`), built from `src/` and linked against the fetched libjxl static archives.
+
+== Platforms
+
+|===
+| Platform | Support
+
+| Windows (x64)
+| Yes (`ffiPlugin`)
+
+| Linux (x86_64)
+| Yes (`ffiPlugin`)
+
+| macOS / iOS / Android / Web
+| Not built; stub returns unavailable
+|===
+
+== License
+
+BSD-3-Clause. libjxl itself has its own license terms; this package only vendors prebuilt static archives at build time.
