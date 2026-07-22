@@ -22,6 +22,21 @@ set_target_properties(jxl_ffi PROPERTIES
 
 target_compile_definitions(jxl_ffi PUBLIC DART_SHARED_LIB)
 
+# Official libjxl Windows prebuilts are static archives. Without these
+# defines, jxl_export.h uses __declspec(dllimport) and the linker looks
+# for __imp_Jxl* symbols that do not exist in the .lib files.
+if (WIN32 AND NOT JXL_FFI_BUILD_STUB)
+  # libjxl static archives are C++; a C-only link skips the STL and leaves
+  # unresolved __std_min_element_* / __std_max_element_* symbols.
+  enable_language(CXX)
+  set_target_properties(jxl_ffi PROPERTIES LINKER_LANGUAGE CXX)
+  target_compile_definitions(jxl_ffi PRIVATE
+    JXL_STATIC_DEFINE
+    JXL_CMS_STATIC_DEFINE
+    JXL_THREADS_STATIC_DEFINE
+  )
+endif()
+
 if (JXL_FFI_INCLUDE)
   target_include_directories(jxl_ffi PRIVATE "${JXL_FFI_INCLUDE}")
 endif()
