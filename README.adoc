@@ -3,21 +3,12 @@ ifndef::env-github[:icons: font]
 :toclevels: 2
 :sectanchors:
 
-ifndef::env-github[]
+[[readme-top]]
 image:https://img.shields.io/github/contributors/AMDphreak/jxl_ffi.svg?style=for-the-badge[Contributors,link=https://github.com/AMDphreak/jxl_ffi/graphs/contributors]
 image:https://img.shields.io/github/forks/AMDphreak/jxl_ffi.svg?style=for-the-badge[Forks,link=https://github.com/AMDphreak/jxl_ffi/network/members]
 image:https://img.shields.io/github/stars/AMDphreak/jxl_ffi.svg?style=for-the-badge[Stars,link=https://github.com/AMDphreak/jxl_ffi/stargazers]
 image:https://img.shields.io/github/issues/AMDphreak/jxl_ffi.svg?style=for-the-badge[Issues,link=https://github.com/AMDphreak/jxl_ffi/issues]
 image:https://img.shields.io/github/license/AMDphreak/jxl_ffi.svg?style=for-the-badge[License,link=https://github.com/AMDphreak/jxl_ffi/blob/main/LICENSE]
-endif::[]
-
-ifdef::env-github[]
-image:https://img.shields.io/github/contributors/AMDphreak/jxl_ffi.svg?style=for-the-badge[Contributors]
-image:https://img.shields.io/github/forks/AMDphreak/jxl_ffi.svg?style=for-the-badge[Forks]
-image:https://img.shields.io/github/stars/AMDphreak/jxl_ffi.svg?style=for-the-badge[Stars]
-image:https://img.shields.io/github/issues/AMDphreak/jxl_ffi.svg?style=for-the-badge[Issues]
-image:https://img.shields.io/github/license/AMDphreak/jxl_ffi.svg?style=for-the-badge[License]
-endif::[]
 
 = jxl_ffi
 
@@ -35,6 +26,8 @@ Flutter FFI plugin wrapping libjxl 0.12.0 static prebuilts for JPEG XL encode/de
 dependencies:
   jxl_ffi: ^0.1.0
 ----
+
+link:#readme-top[back to top]
 
 == Requirements
 
@@ -77,6 +70,8 @@ if (JxlFfi.isAvailable) {
 
 On platforms without `dart:ffi` (for example web), `JxlFfi.isAvailable` is `false` and methods return `null`.
 
+link:#readme-top[back to top]
+
 == API
 
 `JxlFfi` (abstract final class):
@@ -107,8 +102,12 @@ Native symbols live in the plugin shared library (`jxl_ffi.dll` / `libjxl_ffi.so
 
 BSD-3-Clause. libjxl itself has its own license terms; this package only vendors prebuilt static archives at build time.
 
+link:#readme-top[back to top]
+
 == Contact
 
 Ryan Johnson — link:https://twitter.com/amdphreak[@amdphreak]
 
 * Project: https://github.com/AMDphreak/jxl_ffi
+
+link:#readme-top[back to top]
