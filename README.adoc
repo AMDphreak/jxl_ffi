@@ -3,7 +3,28 @@ ifndef::env-github[:icons: font]
 :toclevels: 2
 :sectanchors:
 
-[[readme-top]]
+ifdef::env-github[]
+++++
+<a id="readme-top"></a>
+<div align="center">
+<a href="https://github.com/AMDphreak/jxl_ffi/graphs/contributors"><img src="https://img.shields.io/github/contributors/AMDphreak/jxl_ffi.svg?style=for-the-badge" alt="Contributors"></a>
+<a href="https://github.com/AMDphreak/jxl_ffi/network/members"><img src="https://img.shields.io/github/forks/AMDphreak/jxl_ffi.svg?style=for-the-badge" alt="Forks"></a>
+<a href="https://github.com/AMDphreak/jxl_ffi/stargazers"><img src="https://img.shields.io/github/stars/AMDphreak/jxl_ffi.svg?style=for-the-badge" alt="Stars"></a>
+<a href="https://github.com/AMDphreak/jxl_ffi/issues"><img src="https://img.shields.io/github/issues/AMDphreak/jxl_ffi.svg?style=for-the-badge" alt="Issues"></a>
+<a href="https://github.com/AMDphreak/jxl_ffi/blob/main/LICENSE"><img src="https://img.shields.io/github/license/AMDphreak/jxl_ffi.svg?style=for-the-badge" alt="License"></a>
+<br />
+<h3 align="center">jxl_ffi</h3>
+<p align="center">
+Flutter FFI plugin that wraps **libjxl 0.12.0** static prebuilts for JPEG XL encode and decode on **Windows** and **Linux**.<br />
+<a href="https://github.com/AMDphreak/jxl_ffi/issues">Report Bug</a>
+&middot;
+<a href="https://github.com/AMDphreak/jxl_ffi/issues">Request Feature</a>
+</p>
+</div>
+++++
+endif::[]
+
+ifndef::env-github[]
 image:https://img.shields.io/github/contributors/AMDphreak/jxl_ffi.svg?style=for-the-badge[Contributors,link=https://github.com/AMDphreak/jxl_ffi/graphs/contributors]
 image:https://img.shields.io/github/forks/AMDphreak/jxl_ffi.svg?style=for-the-badge[Forks,link=https://github.com/AMDphreak/jxl_ffi/network/members]
 image:https://img.shields.io/github/stars/AMDphreak/jxl_ffi.svg?style=for-the-badge[Stars,link=https://github.com/AMDphreak/jxl_ffi/stargazers]
@@ -16,6 +37,8 @@ Flutter FFI plugin that wraps **libjxl 0.12.0** static prebuilts for JPEG XL enc
 
 link:https://github.com/AMDphreak/jxl_ffi/issues[Report Bug] ·
 link:https://github.com/AMDphreak/jxl_ffi/issues[Request Feature]
+endif::[]
+
 
 == About The Project
 
