@@ -55,3 +55,7 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+!/.github/
+!/.github/workflows/
+!/.github/workflows/encoding-guard.yml
+!/.editorconfig
