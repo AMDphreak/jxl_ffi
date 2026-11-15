@@ -1,5 +1,6 @@
 ifndef::env-github[:icons: font]
-:toc: preamble
+:toc: macro
+:toc-title:
 :toclevels: 2
 :sectanchors:
 
@@ -39,6 +40,15 @@ link:https://github.com/AMDphreak/jxl_ffi/issues[Report Bug] ·
 link:https://github.com/AMDphreak/jxl_ffi/issues[Request Feature]
 endif::[]
 
+
+++++
+<details>
+<summary>Table of Contents</summary>
+++++
+toc::[]
+++++
+</details>
+++++
 
 == About The Project
 
